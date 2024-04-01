@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ProjectCard from "./ProjectCard";
 import ProjectTag from "./ProjectTag";
+import { motion, useInView } from "framer-motion";
 
 // const projectsData = [
 //   {
@@ -90,12 +91,12 @@ const projectsData = [
   },
   {
     id: 5,
-    title: "Infura-powered Kickstarter",
+    title: "Infura-powered Web3 Instagram",
     description:
       "Stack: Solidity, Infura, Web3.js, Next.js, Truffle, Ganache, Mocha.",
-    image: "/images/projects/nftmarketplace.png",
+    image: "/images/projects/instagram.png",
     tag: ["Engineering", "All"],
-    gitUrl: "https://github.com/vtennero/CrowdCoinStarter2",
+    gitUrl: "https://github.com/vtennero/web3instagram",
     previewUrl: "",
   },
   {
@@ -188,6 +189,8 @@ const projectsData = [
 
 const ProjectsSection = () => {
   const [tag, setTag] = useState("All");
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
 
   const handleTagChange = (newTag) => {
     setTag(newTag);
@@ -196,8 +199,14 @@ const ProjectsSection = () => {
   const filteredProjects = projectsData.filter((project) =>
     project.tag.includes(tag)
   );
+
+  const cardVariants = {
+    initial: { y: 50, opacity: 0 },
+    animate: { y: 0, opacity: 1 },
+  };
+
   return (
-    <div>
+    <section ref={ref} id="mywork">
       <h2 className="text-center text-4xl font-bold text-white mt-4">
         My Work
       </h2>
@@ -228,20 +237,28 @@ const ProjectsSection = () => {
           onClick={handleTagChange}
         />
       </div>
-      <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-        {filteredProjects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            title={project.title}
-            description={project.description}
-            imgUrl={project.image}
-            tags={project.tag}
-            gitUrl={project.gitUrl}
-            previewUrl={project.previewUrl}
-          />
+      <ul className="grid md:grid-cols-3 gap-8 md:gap-12">
+        {filteredProjects.map((project, index) => (
+          <motion.li
+            key={index}
+            variants={cardVariants}
+            initial="initial"
+            animate={isInView ? "animate" : "initial"}
+            transition={{ duration: 0.3, delay: index * 0.4 }}
+          >
+            <ProjectCard
+              key={project.id}
+              title={project.title}
+              description={project.description}
+              imgUrl={project.image}
+              tags={project.tag}
+              gitUrl={project.gitUrl}
+              previewUrl={project.previewUrl}
+            />
+          </motion.li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 };
 
